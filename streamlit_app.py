@@ -153,29 +153,43 @@ def process_data_for_type(df, type_name, x_bin_edges, y_bin_edges, max_count):
     circle_sizes = (bin_counts['count'] / max_count) * 80  # Adjust size relative to max count
     return bin_counts[bin_counts['count'] > 0], circle_sizes, type_name
 
-def pie_chart(df, selected_contents, color_map):
+def high_level_pie_chart(df, color_map):
     # 每个content的percentage在selected content里，全部时间段
     # The percentage of each content type within the selected contents across all time periods.
-    df_selected_contents = df[df['Contents'].isin(selected_contents)]
-    content_count = df_selected_contents['Contents'].value_counts()
+    content_count = df['Contents'].value_counts()
 
     fig, ax = plt.subplots(figsize=(10, 10))
     colors = [color_map.get(content, 'gray') for content in content_count.index]
     ax.pie(content_count, labels=content_count.index, autopct='%1.1f%%', startangle=90, colors=colors)
     ax.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
-
+    ax.set_title('Distribution of Content Types - High Level')
     st.pyplot(fig)
 
-def line_chart(df, selected_times, color_map):
-    df_selected_contents = df[df['time'].isin(selected_times)]
-    selected_count = df_selected_contents['time'].value_counts().sort_index()
+def high_level_line_chart(df, color_map):
+    time_count = df['time'].value_vounts().sort_index()
 
     fig, ax = plt.subplots(figsize=(10, 6))
-    ax.plot(selected_count.index, selected_count.values, marker='o', color=color_map.get('line_color', 'b'))
-    ax.set_title('Count of Occurrences Over Time')
+    ax.plot(time_count.index, time_count.values, marker='o', color=color_map.get('line_color', 'b'))
+    ax.set_title('Count of Occurrences Over Time - High Level')
     ax.set_xlabel('Time')
     ax.set_ylabel('Count')
     plt.xticks(rotation=45)
+    plt.tight_layout()
+    st.pyplot(fig)
+
+def line_chart_by_content(df, selected_contents, color_map):
+    df_selected_contents = df[df['Contents'].isin(selected_contents)]
+
+    fig, ax = plt.subplots(figsize=(12, 6))
+    for content in selected_contents:
+        df_content = df_selected_contents[df_selected_contents['Contents'] == content]
+        content_count = df_content.groupby('time').size()
+        ax.plot(content_count.index, content_count.values, marker='o', label=content, color=color_map.get(content, 'grey'))
+    ax.set_title('Count of Occurrences of Selected Contents Over Time')
+    ax.set_xlabel('Time')
+    ax.set_ylabel('Count')
+    plt.xticks(rotation=45)
+    ax.legend(title='Contents')
     plt.tight_layout()
     st.pyplot(fig)
 
@@ -226,7 +240,7 @@ def main():
             colors = sns.color_palette("tab20", len(types))
             color_map = {subject: color for subject, color in zip(types, colors)}
             
-            st.write('Visualization display here')
+            
             csv_data = save_csv(combined_df)
             st.sidebar.download_button(
                 label="Download CSV",
@@ -242,15 +256,16 @@ def main():
             else:
                 st.warning("Please upload a floorplan to generate the visualization.")
             
-            pie_fig = pie_chart(combined_df, selected_contents, color_map)
-            line_fig = line_chart(combined_df, selected_times, color_map)
+            st.write('High Level Quantitative Analysis')
+            pie_fig = high_level_pie_chart(combined_df, color_map)
+            line_fig = high_level_line_chart(combined_df, color_map)
 
-            col1, col2 = st.columns([2, 1])  # Adjust column width ratios as needed
-            with col1:
-                st.pyplot(pie_fig)
-            with col2:
-                st.pyplot(line_fig)
+            st.pyplot(pie_fig)
+            st.pyplot(line_fig)
 
+            st.write('Detailed Quantitative Analysis')
+            cotent_line_fig = line_chart_by_content(combined_df, selected_contents, color_map)
+            st.pyplot(cotent_line_fig)
 
 
 
