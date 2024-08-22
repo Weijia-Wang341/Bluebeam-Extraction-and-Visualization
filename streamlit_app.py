@@ -89,45 +89,37 @@ def save_csv(df):
 
 def generate_bm(df: pd.DataFrame, background, selected_times, selected_contents, color_map):
     if background is not None:
-        
-
-        background_image = Image.open(background)
-        
-        # Ensure the image is in RGBA format
-        background_image = background_image.convert("RGBA")
+        # Open the background image and ensure it is in RGBA format
+        background_image = Image.open(background).convert("RGBA")
         width, height = background_image.size
 
-        # Resize the data points to fit the background size
-        width_scale_factor = background_image.width / 792  # 792 is the assumed original width
-        height_scale_factor = background_image.height / 612  # 612 is the assumed original height
-
-        df['x_coor'] = df['x_coor'] * width_scale_factor
-        df['y_coor'] = df['y_coor'] * height_scale_factor
-
+        # Determine the bin size for the plot
         bin_size = 8
         x_bin_edges = np.arange(0, width + 1, bin_size)
         y_bin_edges = np.arange(0, height + 1, bin_size)
 
-        max_count = df.groupby(['Contents', pd.cut(df['x_coor'], bins=x_bin_edges, labels=False, right=False), 
-                                pd.cut(df['y_coor'], bins=y_bin_edges, labels=False, right=False)]).size().max()
-        fig, ax = plt.subplots(figsize=(17, 11))
+        # Filter data based on selected times and contents
+        df_filtered = df[df['time'].isin(selected_times) & df['Contents'].isin(selected_contents)]
 
-        # Set the background image
+        # Determine the maximum count for color intensity scaling
+        max_count = df_filtered.groupby([
+            'Contents',
+            pd.cut(df_filtered['x_coor'], bins=x_bin_edges, labels=False, right=False),
+            pd.cut(df_filtered['y_coor'], bins=y_bin_edges, labels=False, right=False)
+        ]).size().max()
+
+        # Create a plot with the background image
+        fig, ax = plt.subplots(figsize=(17, 11))
         ax.imshow(background_image, extent=[0, width, 0, height], aspect='auto')
         ax.axis('off')
-
-        # Prepare color palette and mapping
-
-
-        # Filter data based on selected times and contents
-
-        df_filtered = df[df['time'].isin(selected_times) & df['Contents'].isin(selected_contents)]
 
         added_labels = set()
 
         # Plot each data type
         for type_name in selected_contents:
-            non_zero_bins, circle_sizes, type_name = process_data_for_type(df_filtered, type_name, x_bin_edges, y_bin_edges, max_count)
+            non_zero_bins, circle_sizes, type_name = process_data_for_type(
+                df_filtered, type_name, x_bin_edges, y_bin_edges, max_count
+            )
             color = color_map.get(type_name, 'gray')
             for index, row in non_zero_bins.iterrows():
                 x_center = (row['x_bin'] * bin_size) + bin_size / 2
@@ -143,7 +135,8 @@ def generate_bm(df: pd.DataFrame, background, selected_times, selected_contents,
         plt.legend(loc='upper center', bbox_to_anchor=(.5, 0.1), ncol=7)
 
         # Display the plot in Streamlit
-        st.pyplot(fig)
+        return fig
+
 
 def process_data_for_type(df, type_name, x_bin_edges, y_bin_edges, max_count):
     type_df = df[df['Contents'] == type_name].copy()
@@ -163,10 +156,10 @@ def high_level_pie_chart(df, color_map):
     ax.pie(content_count, labels=content_count.index, autopct='%1.1f%%', startangle=90, colors=colors)
     ax.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
     ax.set_title('Distribution of Content Types - High Level')
-    st.pyplot(fig)
+    return fig
 
 def high_level_line_chart(df, color_map):
-    time_count = df['time'].value_vounts().sort_index()
+    time_count = df['time'].value_counts().sort_index()
 
     fig, ax = plt.subplots(figsize=(10, 6))
     ax.plot(time_count.index, time_count.values, marker='o', color=color_map.get('line_color', 'b'))
@@ -175,7 +168,7 @@ def high_level_line_chart(df, color_map):
     ax.set_ylabel('Count')
     plt.xticks(rotation=45)
     plt.tight_layout()
-    st.pyplot(fig)
+    return fig
 
 def line_chart_by_content(df, selected_contents, color_map):
     df_selected_contents = df[df['Contents'].isin(selected_contents)]
@@ -191,7 +184,7 @@ def line_chart_by_content(df, selected_contents, color_map):
     plt.xticks(rotation=45)
     ax.legend(title='Contents')
     plt.tight_layout()
-    st.pyplot(fig)
+    return fig
 
 
 def main():
