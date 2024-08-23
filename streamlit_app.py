@@ -7,6 +7,8 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import numpy as np
 from PIL import Image
+import matplotlib.dates as mdates
+
 
 st.set_page_config(layout="wide", page_title="PDF to CSV Processor")
 
@@ -171,13 +173,18 @@ def high_level_line_chart(df, color_map):
     return fig
 
 def line_chart_by_content(df, selected_contents, color_map):
+    df['time'] = pd.to_datetime(df['time'], format='%H:%M')
     df_selected_contents = df[df['Contents'].isin(selected_contents)]
 
     fig, ax = plt.subplots(figsize=(12, 6))
     for content in selected_contents:
-        df_content = df_selected_contents[df_selected_contents['Contents'] == content]
+        df_content = df_selected_contents[df_selected_contents['Contents'] == content].sort_values(by='time')
         content_count = df_content.groupby('time').size()
         ax.plot(content_count.index, content_count.values, marker='o', label=content, color=color_map.get(content, 'grey'))
+    
+    ax.xaxis.set_major_formatter(mdates.DateFormatter('%H:%M'))
+    fig.autofmt_xdate()
+
     ax.set_title('Count of Occurrences of Selected Contents Over Time')
     ax.set_xlabel('Time')
     ax.set_ylabel('Count')
