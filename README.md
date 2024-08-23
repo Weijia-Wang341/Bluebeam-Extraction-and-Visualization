@@ -2,12 +2,12 @@
 
 Welcome to the **Bluebeam PDF to CSV and Visual Insights Processor**! This tool is designed to convert PDF documents into structured CSV files and generate insightful visualizations. It integrates powerful ETL (Extract, Transform, Load) pipelines with advanced data visualization features.
 
-[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://bluebeam-extraction-and-visualization.streamlit.app/)
+[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://bluebeam-extraction-and-visualization-a4szjzjyq8qchnzqrtpxv2.streamlit.app/)
 
 
 ## Start Here
 
-To get started with the application, visit [Streamlit app](https://bluebeam-extraction-and-visualization.streamlit.app/) for an interactive experience.
+To get started with the application, visit [Streamlit app](https://bluebeam-extraction-and-visualization-a4szjzjyq8qchnzqrtpxv2.streamlit.app/) for an interactive experience.
 
 <img width="1440" alt="Screenshot 2024-08-22 at 8 48 53 PM" src="https://github.com/user-attachments/assets/151bd2b1-3c5f-46b9-a491-544fd09a1312"> <!-- Replace with your actual image -->
 
