@@ -9,7 +9,7 @@ Welcome to the **Bluebeam PDF to CSV and Visual Insights Processor**! This tool 
 
 To get started with the application, visit [Streamlit app](https://bluebeam-extraction-and-visualization.streamlit.app/) for an interactive experience.
 
-![Placeholder Image](https://via.placeholder.com/600x400)  <!-- Replace with your actual image -->
+<img width="1440" alt="Screenshot 2024-08-22 at 8 48 53 PM" src="https://github.com/user-attachments/assets/151bd2b1-3c5f-46b9-a491-544fd09a1312"> <!-- Replace with your actual image -->
 
 ## Introduction
 
