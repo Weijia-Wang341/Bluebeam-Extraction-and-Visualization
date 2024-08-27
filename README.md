@@ -68,9 +68,10 @@ To run the application, you need to install the following Python packages:
    pip install -r requirements.txt
 Make sure your requirements.txt file includes the following:
    ```bash
-   streamlit==1.20.0
-   pandas==2.0.3
-   matplotlib==3.7.1
-   seaborn==0.12.2
-   numpy==1.25.0
-   Pillow==10.0.0
+streamlit
+pandas
+matplotlib
+seaborn
+numpy
+Pillow
+  
